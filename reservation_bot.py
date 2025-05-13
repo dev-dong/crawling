@@ -9,6 +9,7 @@ from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 import schedule
 import time
+import random
 
 reservation_complete = False
 
@@ -68,14 +69,17 @@ def reserve(driver, date):
     text = "이동호"
     for char in text:
         name.send_keys(char)
-        time.sleep(random)
-    name.send_keys("이동호")
+        time.sleep(random.uniform(0.05, 0.1))
+    # name.send_keys("이동호")
     name.send_keys(Keys.TAB)
 
     phone = driver.switch_to.active_element
     # phone = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "input[name='phone']")))
     # phone.send_keys("01068885740")
-    phone.send_keys("01064819961")
+    phone_text = "01048196169"
+    for char in phone_text:
+        phone.send_keys(char)
+        time.sleep(random.uniform(0.05, 0.1))
 
     select_element = wait.until(EC.presence_of_element_located((By.ID, "step2PeopleWrap")))
     select = Select(select_element)
@@ -88,6 +92,7 @@ def reserve(driver, date):
     # submit.click()
 
     input("Enter 시 종료")
+
 
 if __name__ == "__main__":
     check()
