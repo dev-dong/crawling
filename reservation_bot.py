@@ -30,7 +30,7 @@ def check():
 
         # url 접속
         driver.get('https://www.zerohongdae.com/reservation/60')
-        date = driver.find_element(By.CSS_SELECTOR, f"div[data-date='26'][data-month='4'][data-year='2025']")
+        date = driver.find_element(By.CSS_SELECTOR, f"div[data-date='28'][data-month='4'][data-year='2025']")
         attribute = date.get_attribute("class")
 
         if "-disabled-" in attribute:
@@ -51,14 +51,17 @@ def reserve(driver, date):
 
     wait = WebDriverWait(driver, 5)
 
+    time.sleep(0.28)
     element = wait.until(
         # 테마선택
-        EC.element_to_be_clickable((By.CSS_SELECTOR, "#themeChoice > label:nth-child(4)"))
+        EC.element_to_be_clickable((By.CSS_SELECTOR, "#themeChoice > label:nth-child(5)"))
     )
     element.click()
 
+    time.sleep(0.19)
+
     # 시간선택
-    element2 = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "#themeTimeWrap > label:nth-child(9)")))
+    element2 = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "#themeTimeWrap > label:nth-child(7)")))
     element2.click()
 
     nextButton = wait.until(EC.element_to_be_clickable((By.ID, "nextBtn")))
@@ -69,7 +72,7 @@ def reserve(driver, date):
     text = "이동호"
     for char in text:
         name.send_keys(char)
-        time.sleep(random.uniform(0.05, 0.1))
+        time.sleep(random.uniform(0.025, 0.05))
     # name.send_keys("이동호")
     name.send_keys(Keys.TAB)
 
@@ -79,7 +82,7 @@ def reserve(driver, date):
     phone_text = "01048196169"
     for char in phone_text:
         phone.send_keys(char)
-        time.sleep(random.uniform(0.05, 0.1))
+        time.sleep(random.uniform(0.015, 0.03))
 
     select_element = wait.until(EC.presence_of_element_located((By.ID, "step2PeopleWrap")))
     select = Select(select_element)
