@@ -52,14 +52,14 @@ def reserve(driver, date):
 
     wait = WebDriverWait(driver, 5)
 
-    time.sleep(0.28)
+    time.sleep(0.015)
     element = wait.until(
         # 테마선택
         EC.element_to_be_clickable((By.CSS_SELECTOR, "#themeChoice > label:nth-child(5)"))
     )
     element.click()
 
-    time.sleep(0.19)
+    time.sleep(0.015)
 
     # 시간선택
     print("시간선택")
@@ -119,7 +119,7 @@ def midnight_task():
 
 if __name__ == "__main__":
     # check()
-    schedule.every().day.at("13:00").do(midnight_task)
+    schedule.every().day.at("16:55").do(midnight_task)
     # schedule.every(1).seconds.do(check)
 
     while True:
