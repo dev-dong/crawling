@@ -30,15 +30,16 @@ def check():
 
         # url 접속
         driver.get('https://www.zerohongdae.com/reservation/60')
-        date = driver.find_element(By.CSS_SELECTOR, f"div[data-date='28'][data-month='4'][data-year='2025']")
+        date = driver.find_element(By.CSS_SELECTOR, f"div[data-date='30'][data-month='4'][data-year='2025']")
         attribute = date.get_attribute("class")
 
         if "-disabled-" in attribute:
             print(f"{day} : 날짜는 선택불가능")
         else:
             print("이 날짜는 선택가능")
-            reservation_complete = True
-            reserve(driver, date)
+            success = reserve(driver, date)
+            if success:
+                reservation_complete = True
     except Exception as err:
         print(err)
     finally:
@@ -61,50 +62,66 @@ def reserve(driver, date):
     time.sleep(0.19)
 
     # 시간선택
-    element2 = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "#themeTimeWrap > label:nth-child(7)")))
-    element2.click()
+    print("시간선택")
+    is_enabled_time = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "#themeTimeWrap > label:nth-child(7) > input")))
+    if is_enabled_time.get_attribute("disabled") is None:
+        element2 = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "#themeTimeWrap > label:nth-child(7)")))
+        element2.click()
+        nextButton = wait.until(EC.element_to_be_clickable((By.ID, "nextBtn")))
+        nextButton.click()
 
-    nextButton = wait.until(EC.element_to_be_clickable((By.ID, "nextBtn")))
-    nextButton.click()
+        name = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".el-input.bs-bb:nth-child(1)")))
+        # name.send_keys("김은지")
+        text = "이동호"
+        for char in text:
+            name.send_keys(char)
+            time.sleep(random.uniform(0.025, 0.05))
+        # name.send_keys("이동호")
+        name.send_keys(Keys.TAB)
 
-    name = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".el-input.bs-bb:nth-child(1)")))
-    # name.send_keys("김은지")
-    text = "이동호"
-    for char in text:
-        name.send_keys(char)
-        time.sleep(random.uniform(0.025, 0.05))
-    # name.send_keys("이동호")
-    name.send_keys(Keys.TAB)
+        phone = driver.switch_to.active_element
+        # phone = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "input[name='phone']")))
+        # phone.send_keys("01068885740")
+        phone_text = "01048196169"
+        for char in phone_text:
+            phone.send_keys(char)
+            time.sleep(random.uniform(0.015, 0.02))
 
-    phone = driver.switch_to.active_element
-    # phone = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "input[name='phone']")))
-    # phone.send_keys("01068885740")
-    phone_text = "01048196169"
-    for char in phone_text:
-        phone.send_keys(char)
-        time.sleep(random.uniform(0.015, 0.03))
+        select_element = wait.until(EC.presence_of_element_located((By.ID, "step2PeopleWrap")))
+        select = Select(select_element)
+        select.select_by_value("2")
 
-    select_element = wait.until(EC.presence_of_element_located((By.ID, "step2PeopleWrap")))
-    select = Select(select_element)
-    select.select_by_value("2")
+        checkbox = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".el-rc.fw7")))
+        checkbox.click()
 
-    checkbox = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".el-rc.fw7")))
-    checkbox.click()
+        # submit = wait.until(EC.element_to_be_clickable((By.ID, "reservationBtn")))
+        # submit.click()
 
-    # submit = wait.until(EC.element_to_be_clickable((By.ID, "reservationBtn")))
-    # submit.click()
+        print("예약 성공!")
+        return True
+    else:
+        print("해당 시간은 아직 비활성화 상태입니다.")
+        return False
 
-    input("Enter 시 종료")
+def midnight_task():
+    global reservation_complete
+
+    for attempt in range(1, 10):
+        reservation_complete = False
+
+        try:
+            check()
+            if reservation_complete:
+                break
+        except Exception as err:
+            print(f"실패: {err}")
 
 
 if __name__ == "__main__":
-    check()
+    # check()
+    schedule.every().day.at("13:00").do(midnight_task)
     # schedule.every(1).seconds.do(check)
-    #
-    # while True:
-    #     schedule.run_pending()
-    #     if reservation_complete:
-    #         print("예약완료! 프로그램 종료!")
-    #         break
-    #
-    #     time.sleep(1)
+
+    while True:
+        schedule.run_pending()
+        # time.sleep(1)
